@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulario Extendido con Contraseña -Brayan</title>
+<style>
+  *{ box-sizing: border-box; }
+  body{
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .main{ display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 1100px; width:100%; }
+  .contenedor{
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 450px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  }
+  .lista{
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 520px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  }
+  .creador{ text-align:center; color:#764ba2; font-weight:bold; font-size:13px; }
+  h2{ text-align:center; color:#333; }
+  label{ font-weight:600; font-size:14px; color:#444; display:block; margin-top:16px; }
+  
+  .input-group{ position: relative; }
+  .input-group input{ padding-right: 45px; }
+  input, select{
+    width: 100%;
+    padding: 12px 15px;
+    margin-top: 6px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    outline: none;
+    transition: 0.3s;
+    font-size: 14px;
+  }
+  input:focus, select:focus{ border-color:#667eea; }
+  .error{ color:#e74c3c; font-size:11px; margin-top:4px; display:none; }
+  .input-error{ border-color:#e74c3c !important; }
+  .input-ok{ border-color:#2ecc71 !important; }
+
+  .toggle-pass{
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-top:3px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 18px;
+    width: auto;
+    padding: 0;
+  }
+
+  .requisitos{ background:#f8f9ff; padding:10px 15px; border-radius:10px; margin-top:8px; font-size:11px; color:#666; }
+  .req{ margin:2px 0; }
+  .req.ok{ color:#27ae60; }
+  .req.bad{ color:#e74c3c; }
+
+  button{ width:100%; padding:14px; margin-top:10px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; }
+  .btn-registrar{ background: linear-gradient(135deg, #667eea, #764ba2); color:white; margin-top:25px; }
+  .btn-registrar:hover{ transform: translateY(-2px); }
+  .btn-limpiar{ background:#ecf0f1; color:#333; }
+
+  #mensaje{ text-align:center; margin-top:20px; padding:12px; border-radius:10px; font-weight:bold; display:none; }
+  .msg-error{ background:#ffeaea; color:#e74c3c; display:block !important; }
+  .msg-ok{ background:#eafaf1; color:#27ae60; display:block !important; }
+
+  table{ width:100%; border-collapse: collapse; margin-top:15px; }
+  th{ background:#f8f9fa; padding:8px; font-size:12px; }
+  td{ padding:8px; border-bottom:1px solid #eee; font-size:12px; word-break: break-all; }
+  .btn-del{ background:#ff6b6b; color:white; padding:4px 8px; border-radius:6px; font-size:11px; width:auto; }
+  .vacio{ text-align:center; color:#999; padding:20px; }
+  .strength{ height:5px; border-radius:5px; margin-top:6px; background:#eee; overflow:hidden; }
+  .strength-bar{ height:100%; width:0%; transition:0.3s; }
+</style>
+</head>
+<body>
+
+<div class="main">
+
+<div class="contenedor">
+  <p class="creador">Creado por:lucero</p>
+  <h2>Formulario de registro</h2>
+
+  <label>Nombre completo *</label>
+  <input type="text" id="nombre" placeholder="Brayan Torres" onkeyup="validarNombre()">
+  <div class="error" id="error-nombre"></div>
+
+  <label>Teléfono *</label>
+  <input type="tel" id="telefono" placeholder="3312345678" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onkeyup="validarTelefono()">
+  <div class="error" id="error-tel"></div>
+
+  <label>Correo *</label>
+  <input type="email" id="correo" placeholder="brayan@gmail.com" onkeyup="validarCorreo()">
+  <div class="error" id="error-correo"></div>
+
+  <label>Contraseña *</label>
+  <div class="input-group">
+    <input type="password" id="pass" placeholder="Mín 8 caracteres" onkeyup="validarPass()">
+    <button class="toggle-pass" onclick="togglePass('pass', this)">👁️</button>
+  </div>
+  <div class="strength"><div class="strength-bar" id="strength-bar"></div></div>
+  <div class="requisitos" id="requisitos">
+    <div class="req" id="req-long">❌ 8 caracteres mínimo</div>
+    <div class="req" id="req-may">❌ 1 mayúscula</div>
+    <div class="req" id="req-num">❌ 1 número</div>
+  </div>
+  <div class="error" id="error-pass"></div>
+
+  <label>Confirmar contraseña *</label>
+  <div class="input-group">
+    <input type="password" id="pass2" placeholder="Repite la contraseña" onkeyup="validarPass2()">
+    <button class="toggle-pass" onclick="togglePass('pass2', this)">👁️</button>
+  </div>
+  <div class="error" id="error-pass2"></div>
+
+  <label style="font-weight:normal; display:flex; gap:8px; margin-top:20px;">
+    <input type="checkbox" id="terminos" style="width:auto;"> Acepto términos
+  </label>
+  <div class="error" id="error-terminos"></div>
+
+  <button class="btn-registrar" onclick="registrarUsuario()">Crear Cuenta</button>
+  <button class="btn-limpiar" onclick="limpiarFormulario()">Limpiar</button>
+
+  <div id="mensaje"></div>
+</div>
+
+<div class="lista">
+  <h2>Registrados (<span id="contador">0</span>)</h2>
+  <div id="contenedor-tabla"><p class="vacio">No hay registros</p></div>
+  <button class="btn-limpiar" onclick="borrarTodo()" style="margin-top:20px;">Borrar Todo</button>
+</div>
+
+</div>
+
+<script>
+let usuarios = JSON.parse(localStorage.getItem("usuarios_brayan_ext")) || [];
+
+function togglePass(id, btn){
+  let input = document.getElementById(id);
+  if(input.type == "password"){
+    input.type = "text";
+    btn.textContent = "🙈";
+  } else {
+    input.type = "password";
+    btn.textContent = "👁️";
+  }
+}
+
+function validarNombre(){
+  let i = document.getElementById("nombre"), e = document.getElementById("error-nombre");
+  let v = i.value.trim();
+  if(!v){ i.className=""; e.style.display="none"; return false; }
+  if(!/^[A-Za-zÁÉÍÓÚáéíóúñÑ ]{3,50}$/.test(v)){
+    i.classList.add("input-error"); e.textContent="❌ Solo letras, 3 a 50 caracteres"; e.style.display="block"; return false;
+  }
+  i.classList.add("input-ok"); i.classList.remove("input-error"); e.style.display="none"; return true;
+}
+
+function validarTelefono(){
+  let i = document.getElementById("telefono"), e = document.getElementById("error-tel");
+  let v = i.value.trim();
+  if(!v){ i.className=""; e.style.display="none"; return false; }
+  if(!/^[0-9]{10}$/.test(v)){
+    i.classList.add("input-error"); e.textContent="❌ 10 dígitos exactos"; e.style.display="block"; return false;
+  }
+  i.classList.add("input-ok"); i.classList.remove("input-error"); e.style.display="none"; return true;
+}
+
+function validarCorreo(){
+  let i = document.getElementById("correo"), e = document.getElementById("error-correo");
+  let v = i.value.trim();
+  if(!v){ i.className=""; e.style.display="none"; return false; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){
+    i.classList.add("input-error"); e.textContent="❌ Correo no válido"; e.style.display="block"; return false;
+  }
+  if(usuarios.some(u=>u.correo.toLowerCase()==v.toLowerCase())){
+    i.classList.add("input-error"); e.textContent="❌ Ya registrado"; e.style.display="block"; return false;
+  }
+  i.classList.add("input-ok"); i.classList.remove("input-error"); e.style.display="none"; return true;
+}
+
+function validarPass(){
+  let i = document.getElementById("pass"), bar = document.getElementById("strength-bar");
+  let v = i.value;
+  
+  let long = v.length >= 8;
+  let may = /[A-Z]/.test(v);
+  let num = /[0-9]/.test(v);
+
+  document.getElementById("req-long").textContent = (long?"✅ ":"❌ ")+"8 caracteres mínimo";
+  document.getElementById("req-long").className = "req "+(long?"ok":"bad");
+  document.getElementById("req-may").textContent = (may?"✅ ":"❌ ")+"1 mayúscula";
+  document.getElementById("req-may").className = "req "+(may?"ok":"bad");
+  document.getElementById("req-num").textContent = (num?"✅ ":"❌ ")+"1 número";
+  document.getElementById("req-num").className = "req "+(num?"ok":"bad");
+
+  let score = [long,may,num].filter(Boolean).length;
+  bar.style.width = score*33.3 + "%";
+  bar.style.background = score==1?"#e74c3c":score==2?"#f1c40f":score==3?"#2ecc71":"#eee";
+
+  if(!v){ i.className=""; return false; }
+  if(!(long&&may&&num)){
+    i.classList.add("input-error"); return false;
+  }
+  i.classList.add("input-ok"); i.classList.remove("input-error");
+  validarPass2();
+  return true;
+}
+
+function validarPass2(){
+  let p1 = document.getElementById("pass").value;
+  let i = document.getElementById("pass2"), e = document.getElementById("error-pass2");
+  let v = i.value;
+  if(!v){ i.className=""; e.style.display="none"; return false; }
+  if(v !== p1){
+    i.classList.add("input-error"); e.textContent="❌ Las contraseñas no coinciden"; e.style.display="block"; return false;
+  }
+  i.classList.add("input-ok"); i.classList.remove("input-error"); e.style.display="none"; return true;
+}
+
+function registrarUsuario(){
+  let nombre = document.getElementById("nombre").value.trim();
+  let telefono = document.getElementById("telefono").value.trim();
+  let correo = document.getElementById("correo").value.trim();
+  let pass = document.getElementById("pass").value;
+  let terminos = document.getElementById("terminos").checked;
+  let mensaje = document.getElementById("mensaje");
+
+  let v1=validarNombre(), v2=validarTelefono(), v3=validarCorreo(), v4=validarPass(), v5=validarPass2();
+
+  if(!v1||!v2||!v3||!v4||!v5){
+    mensaje.textContent="❌ NO VALIDADO: Corrige los campos en rojo"; mensaje.className="msg-error"; return;
+  }
+  if(!terminos){
+    document.getElementById("error-terminos").textContent="❌ Acepta los términos"; document.getElementById("error-terminos").style.display="block";
+    mensaje.textContent="❌ NO VALIDADO: Acepta los términos"; mensaje.className="msg-error"; return;
+  }
+
+  let nuevo={ id:Date.now(), nombre, telefono, correo, pass: btoa(pass), fecha:new Date().toLocaleString() };
+  usuarios.push(nuevo);
+  localStorage.setItem("usuarios_brayan_ext", JSON.stringify(usuarios));
+
+  mensaje.innerHTML="✅ VALIDADO: Cuenta creada para "+nombre; mensaje.className="msg-ok";
+  limpiarCampos(); mostrarUsuarios();
+}
+
+function limpiarCampos(){
+  ["nombre","telefono","correo","pass","pass2"].forEach(id=>{
+    document.getElementById(id).value=""; document.getElementById(id).className="";
+  });
+  document.getElementById("strength-bar").style.width="0%";
+  document.querySelectorAll(".req").forEach(r=>{ r.className="req bad"; r.textContent=r.textContent.replace("✅","❌"); });
+}
+
+function limpiarFormulario(){
+  limpiarCampos();
+  document.getElementById("mensaje").style.display="none";
+  document.querySelectorAll(".error").forEach(e=>e.style.display="none");
+  document.getElementById("terminos").checked=false;
+}
+
+function mostrarUsuarios(){
+  document.getElementById("contador").textContent=usuarios.length;
+  let cont=document.getElementById("contenedor-tabla");
+  if(!usuarios.length){ cont.innerHTML='<p class="vacio">No hay registros</p>'; return; }
+  let html='<table><tr><th>Nombre</th><th>Tel</th><th>Correo</th><th></th></tr>';
+  usuarios.forEach(u=>{
+    html+=`<tr><td>${u.nombre}</td><td>${u.telefono}</td><td>${u.correo}</td><td><button class="btn-del" onclick="eliminar(${u.id})">X</button></td></tr>`;
+  });
+  html+='</table>'; cont.innerHTML=html;
+}
+function eliminar(id){ usuarios=usuarios.filter(u=>u.id!=id); localStorage.setItem("usuarios_brayan_ext", JSON.stringify(usuarios)); mostrarUsuarios(); }
+function borrarTodo(){ if(confirm("¿Borrar todo?")){ usuarios=[]; localStorage.removeItem("usuarios_brayan_ext"); mostrarUsuarios(); } }
+mostrarUsuarios();
+</script>
+
+</body>
+</html>
